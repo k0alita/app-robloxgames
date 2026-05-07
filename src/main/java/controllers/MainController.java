@@ -1,8 +1,10 @@
 package controllers;
 
+import dao.JuegoDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import models.Juego;
@@ -12,9 +14,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class MainController {
-    @FXML
-    private TextField txtBuscarTitulo;
+public class MainController implements Initializable {
+    @FXML private TextField txtBuscarTitulo;
     @FXML private ComboBox<String> comboBuscarPlataforma;
 
     @FXML private TableView<Juego> tablaJuegos;
