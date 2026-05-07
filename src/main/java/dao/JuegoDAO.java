@@ -55,3 +55,72 @@ public class JuegoDAO {
         }
         return lista;
     }
+    public boolean insertarJuegoConTransaccion(Juego juego, List<Integer> idsPlataformas, List<Integer> idsGeneros) {
+        String sqlJuego = "INSERT INTO juegos (titulo, desarrolladora, anio_lanzamiento) VALUES (?, ?, ?)";
+        String sqlPlataforma = "INSERT INTO juegos_plataformas (id_juego, id_plataforma) VALUES (?, ?)";
+        String sqlGenero = "INSERT INTO juegos_generos (id_juego, id_genero) VALUES (?, ?)";
+
+        Connection conexion = null;
+        try {
+            conexion = ConexionDB.getConnection();
+            conexion.setAutoCommit(false);
+
+            try (PreparedStatement psJuego = conexion.prepareStatement(sqlJuego, Statement.RETURN_GENERATED_KEYS)) {
+                psJuego.setString(1, juego.getTitulo());
+                psJuego.setString(2, juego.getDesarrolladora());
+                psJuego.setInt(3, juego.getAnioLanzamiento());
+                psJuego.executeUpdate();
+
+                try (ResultSet rs = psJuego.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        int idJuego = rs.getInt(1);
+
+                        // Insertar todas las plataformas seleccionadas
+                        try (PreparedStatement psPlat = conexion.prepareStatement(sqlPlataforma)) {
+                            for (int idPlat : idsPlataformas) {
+                                psPlat.setInt(1, idJuego);
+                                psPlat.setInt(2, idPlat);
+                                psPlat.executeUpdate();
+                            }
+                        }
+
+                        // Insertar todos los géneros seleccionados
+                        try (PreparedStatement psGen = conexion.prepareStatement(sqlGenero)) {
+                            for (int idGen : idsGeneros) {
+                                psGen.setInt(1, idJuego);
+                                psGen.setInt(2, idGen);
+                                psGen.executeUpdate();
+                            }
+                        }
+                    }
+                }
+            }
+
+            conexion.commit();
+            return true;
+
+        } catch (SQLException e) {
+            System.err.println("Error en la transacción. Haciendo rollback ...");
+            if (conexion != null) {
+                try { conexion.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (conexion != null) {
+                try { conexion.setAutoCommit(true); conexion.close(); } catch (SQLException e) { e.printStackTrace(); }
+            }
+        }
+    }
+
+    public void eliminarJuego(int idJuego) {
+        String sql = "DELETE FROM juegos WHERE id_juego = ?";
+        try (Connection conn = ConexionDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idJuego);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
