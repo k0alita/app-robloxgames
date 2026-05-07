@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class ConexionDB {
     private static final String URL = "jdbc:mariadb://localhost:3306/robuxgames";
     private static final String USER = "root";
-    private static final String PASS = "Maanjasi4";
+    private static final String PASS = "root";
 
     public static Connection getConnection() throws SQLException {
         try {
