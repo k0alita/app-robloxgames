@@ -55,6 +55,7 @@ public class JuegoDAO {
         }
         return lista;
     }
+
     public boolean insertarJuegoConTransaccion(Juego juego, List<Integer> idsPlataformas, List<Integer> idsGeneros) {
         String sqlJuego = "INSERT INTO juegos (titulo, desarrolladora, anio_lanzamiento) VALUES (?, ?, ?)";
         String sqlPlataforma = "INSERT INTO juegos_plataformas (id_juego, id_plataforma) VALUES (?, ?)";
